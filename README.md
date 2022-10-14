@@ -86,9 +86,14 @@ install and configure ansible on ec2 instance
         name: wireshark
         state: latest
   ```
-  
-
-
+ #### Updating GIT with the latest code
+ ```
+ git status
+ git add .
+ git commit -m "commit message"
+ git push origin "feature branch name"
+ ```
+ <img width="429" alt="git push" src="https://user-images.githubusercontent.com/112771723/195860755-eda282f1-4c7e-4102-8d60-f5ebaa41019e.png">
 
 
 
