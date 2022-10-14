@@ -86,7 +86,7 @@ install and configure ansible on ec2 instance
         name: wireshark
         state: latest
   ```
- #### Updating GIT with the latest code
+ ### STEP 3: Updating GIT with the latest code
  ```
  git status
  git add .
@@ -96,7 +96,7 @@ install and configure ansible on ec2 instance
 <img width="429" alt="git push" src="https://user-images.githubusercontent.com/112771723/195860755-eda282f1-4c7e-4102-8d60-f5ebaa41019e.png">
 <img width="685" alt="push git" src="https://user-images.githubusercontent.com/112771723/195861832-3a554ef0-b892-4965-94ec-142bdcdc994a.png">
 
-### Running first Ansible test
+### STEP 4: Running first Ansible test
 ##### Command:
 ```
 cd ansible-config-mgt
