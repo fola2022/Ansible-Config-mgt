@@ -93,13 +93,30 @@ install and configure ansible on ec2 instance
  git commit -m "commit message"
  git push origin "feature branch name"
  ```
- <img width="429" alt="git push" src="https://user-images.githubusercontent.com/112771723/195860755-eda282f1-4c7e-4102-8d60-f5ebaa41019e.png">
+<img width="429" alt="git push" src="https://user-images.githubusercontent.com/112771723/195860755-eda282f1-4c7e-4102-8d60-f5ebaa41019e.png">
+<img width="685" alt="push git" src="https://user-images.githubusercontent.com/112771723/195861832-3a554ef0-b892-4965-94ec-142bdcdc994a.png">
 
+### Running first Ansible test
+##### Command:
+```
+cd ansible-config-mgt
+ansible-playbook -i inventory/dev.yml playbooks/common.yml
+```
+<img width="627" alt="playbook run" src="https://user-images.githubusercontent.com/112771723/195862356-83550fae-de39-4e49-935c-9c584b548f82.png">
 
+#### Checking the wireshark version installed on NFS server
+<img width="484" alt="wireshark on nfs" src="https://user-images.githubusercontent.com/112771723/195862794-30e3b250-329f-441e-9a40-801f8979dd33.png">
 
+#### Checking the wireshark version installed on Database server
+<img width="569" alt="wireshark on db" src="https://user-images.githubusercontent.com/112771723/195862974-d2e1cab1-d5f9-4f54-af22-e7713febae23.png">
 
+#### Checking the wireshark version installed on webserver 1 and 2 server
 
+<img width="491" alt="wireshark on wb1" src="https://user-images.githubusercontent.com/112771723/195863117-9c411902-0e63-4962-8966-09e09aedd973.png">
+<img width="586" alt="wireshark on wb2" src="https://user-images.githubusercontent.com/112771723/195863137-167ba3f5-6bf6-4560-8bcf-c1576c838742.png">
 
+#### Checking the wireshark version installed on load balancer server
+<img width="554" alt="wireshark on lb" src="https://user-images.githubusercontent.com/112771723/195863253-57603623-2e83-416d-ad54-adbf7b9e0678.png">
 
 
 
