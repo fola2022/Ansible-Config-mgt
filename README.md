@@ -118,5 +118,5 @@ ansible-playbook -i inventory/dev.yml playbooks/common.yml
 #### Checking the wireshark version installed on load balancer server
 <img width="554" alt="wireshark on lb" src="https://user-images.githubusercontent.com/112771723/195863253-57603623-2e83-416d-ad54-adbf7b9e0678.png">
 
-#### save artifact
+
 
