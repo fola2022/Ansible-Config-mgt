@@ -1,4 +1,4 @@
 ---
 - hosts: nginx
 - name: install nginx
-  ansible.builtin.install_playbook: ../static-assignments/nginx.yml
+  ansible.builtin.import_playbook: ../static-assignments/nginx.yml
