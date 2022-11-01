@@ -1,11 +1,6 @@
 ---
 # tasks file for artifactory
 
-- name: import assert.yml
-  ansible.builtin.import_tasks: assert.yml
-  run_once: yes
-  delegate_to: localhost
-
 - name: install java 11
   ansible.builtin.yum:
     name: java-11-openjdk-devel
@@ -18,18 +13,15 @@
       - unzip
     state: present
 
-- name: configure artifactory
+- name: Configuring java path
   ansible.builtin.template:
     src: templates/bash-profile.j2
     dest: .bash_profile
-    mode: "0644"
-    owner: artifactory
-    group: artifactory
-  notify:
-    - restart artifactory
+  
 
 - name: reload the /etc/profile
   shell: source ~/.bash_profile
+
 
 - name: add the repository key to repos list
   ansible.builtin.get_url:
@@ -44,13 +36,14 @@
     remote_src: yes
     follow: yes
 
-- name: set ownership for artifactory_logs
-  ansible.builtin.file:
-    path: "{{ artifactory_logs }}"
-    state: directory
-    mode: "0755"
-    owner: artifactory
-    group: artifactory
+- name: update cache
+  ansible.builtin.yum:
+    update_cache: yes
+
+- name: install artifactory
+  ansible.builtin.yum:
+    name: jfrog-artifactory-oss
+    state: present
 
 - name: start and enable artifactory
   ansible.builtin.service:
