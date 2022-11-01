@@ -18,14 +18,6 @@
       - unzip
     state: present
 
-- name: ensure artifactory_file_store_dir exists
-  ansible.builtin.file:
-    path: "{{ artifactory_file_store_dir }}"
-    state: directory
-    mode: "0755"
-    owner: artifactory
-    group: artifactory
-
 - name: configure artifactory
   ansible.builtin.template:
     src: binarystore.xml.j2
