@@ -6,9 +6,16 @@
   run_once: yes
   delegate_to: localhost
 
-- name: install package
-  ansible.builtin.package:
-    name: jfrog-artifactory-{{ artifactory_flavour }}
+- name: install java 11
+  ansible.builtin.yum:
+    name: java-11-openjdk-devel
+    state: present
+
+- name: install java 11
+  ansible.builtin.yum:
+    name: 
+      - wget
+      - unzip
     state: present
 
 - name: ensure artifactory_file_store_dir exists
