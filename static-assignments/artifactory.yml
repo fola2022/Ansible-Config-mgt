@@ -1,5 +1,5 @@
 ---
-- hosts: artifactory
-  become: true
+- name: install artifactory role
+  hosts: artifactory
   roles:
     - artifactory
