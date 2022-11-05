@@ -35,12 +35,4 @@
     name: sonarqube
     encoding: UTF-8
 
-   
-
-- name: Create user sonarqube
-  become_user: postgres
-  community.postgresql.postgresql_user:
-    db: sonarqube
-    name: sonar
-    password: sonar
-    priv: "ALL"
+  
