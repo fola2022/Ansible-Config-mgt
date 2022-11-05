@@ -1,7 +1,5 @@
 # Property values can:
-# - be overridden by environment variables. The name of the corresponding environment variable is the
-#   upper-cased name of the property where all the dot ('.') and dash ('-') characters are replaced by
-#   underscores ('_'). For example, to override 'sonar.web.systemPasscode' use 'SONAR_WEB_SYSTEMPASSCODE'.
+# - reference an environment variable, for example sonar.jdbc.url= ${env:SONAR_JDBC_URL}
 # - be encrypted. See https://redirect.sonarsource.com/doc/settings-encryption.html
 
 #--------------------------------------------------------------------------------------------------
@@ -9,40 +7,48 @@
 #
 # IMPORTANT:
 # - The embedded H2 database is used by default. It is recommended for tests but not for
-#   production use. Supported databases are Oracle, PostgreSQL and Microsoft SQLServer.
+#   production use. Supported databases are MySQL, Oracle, PostgreSQL and Microsoft SQLServer.
 # - Changes to database connection URL (sonar.jdbc.url) can affect SonarSource licensed products.
 
 # User credentials.
 # Permissions to create tables, indices and triggers must be granted to JDBC user.
 # The schema must be created first.
-sonar.jdbc.username={{sonar_jdbc_username}}
-sonar.jdbc.password={{sonar_jdbc_password}}
+
 
 #----- Embedded Database (default)
 # H2 embedded database server listening port, defaults to 9092
 #sonar.embeddedDatabase.port=9092
 
+#----- DEPRECATED
+#----- MySQL >=5.6 && <8.0
+# Support of MySQL is dropped in Data Center Editions and deprecated in all other editions
+# Only InnoDB storage engine is supported (not myISAM).
+# Only the bundled driver is supported. It can not be changed.
+#sonar.jdbc.url=jdbc:mysql://localhost:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false
 
-#----- Oracle 11g/12c/18c/19c
+
+#----- Oracle 11g/12c
 # The Oracle JDBC driver must be copied into the directory extensions/jdbc-driver/oracle/.
-# Only the thin client is supported, and we recommend using the latest Oracle JDBC driver. See
+# Only the thin client is supported, and only the versions 11.2.x or 12.2.x must be used. See
 # https://jira.sonarsource.com/browse/SONAR-9758 for more details.
 # If you need to set the schema, please refer to http://jira.sonarsource.com/browse/SONAR-5000
 #sonar.jdbc.url=jdbc:oracle:thin:@localhost:1521/XE
 
-
 #----- PostgreSQL 9.3 or greater
 # By default the schema named "public" is used. It can be overridden with the parameter "currentSchema".
-sonar.jdbc.url=jdbc:postgresql://{{sonar_jdbc_host}}:{{sonar_jdbc_port}}/{{sonar_jdbc_ddbb}}
+sonar.jdbc.url=jdbc:postgresql://localhost:5432/sonarqube
+sonar.jdbc.username=sonar
+sonar.jdbc.password=sonar
 
 
-#----- Microsoft SQLServer 2014/2016/2017 and SQL Azure
+#----- Microsoft SQLServer 2014/2016 and SQL Azure
 # A database named sonar must exist and its collation must be case-sensitive (CS) and accent-sensitive (AS)
 # Use the following connection string if you want to use integrated security with Microsoft Sql Server
 # Do not set sonar.jdbc.username or sonar.jdbc.password property if you are using Integrated Security
-# For Integrated Security to work, you have to download the Microsoft SQL JDBC Driver 9.2.0 package from
-# https://docs.microsoft.com/en-us/sql/connect/jdbc/release-notes-for-the-jdbc-driver?view=sql-server-ver15#92
-# and copy mssql-jdbc_auth-9.2.0.x64.dll to your path.
+# For Integrated Security to work, you have to download the Microsoft SQL JDBC driver package from
+# https://www.microsoft.com/en-us/download/details.aspx?id=55539
+# and copy sqljdbc_auth.dll to your path. You have to copy the 32 bit or 64 bit version of the dll
+# depending upon the architecture of your server machine.
 #sonar.jdbc.url=jdbc:sqlserver://localhost;databaseName=sonar;integratedSecurity=true
 
 # Use the following connection string if you want to use SQL Auth while connecting to MS Sql Server.
@@ -64,8 +70,6 @@ sonar.jdbc.url=jdbc:postgresql://{{sonar_jdbc_host}}:{{sonar_jdbc_port}}/{{sonar
 
 # The minimum number of connections that can remain idle in the pool,
 # without extra ones being created, or zero to create none.
-#sonar.jdbc.minIdle=2
-
 # The maximum number of milliseconds that the pool will wait (when there
 # are no available connections) for a connection to be returned before
 # throwing an exception, or <= 0 to wait indefinitely.
@@ -78,7 +82,7 @@ sonar.jdbc.url=jdbc:postgresql://{{sonar_jdbc_host}}:{{sonar_jdbc_port}}/{{sonar
 
 #--------------------------------------------------------------------------------------------------
 # WEB SERVER
-# Web server is executed in a dedicated Java process. By default heap size is 512MB.
+# Web server is executed in a dedicated Java process. By default heap size is 512Mb.
 # Use the following property to customize JVM options.
 #    Recommendations:
 #
@@ -93,18 +97,19 @@ sonar.jdbc.url=jdbc:postgresql://{{sonar_jdbc_host}}:{{sonar_jdbc_port}}/{{sonar
 #sonar.web.javaOpts=-Xmx512m -Xms128m -XX:+HeapDumpOnOutOfMemoryError
 
 # Same as previous property, but allows to not repeat all other settings like -Xmx
-#sonar.web.javaAdditionalOpts=
+sonar.web.javaAdditionalOpts=-server
 
 # Binding IP address. For servers with more than one IP address, this property specifies which
 # address will be used for listening on the specified ports.
 # By default, ports will be used on all IP addresses associated with the server.
-#sonar.web.host=0.0.0.0
+snar.web.host=0.0.0.0
 
 # Web context. When set, it must start with forward slash (for example /sonarqube).
 # The default value is root context (empty value).
-#sonar.web.context=
+
+sonar.web.context= /sonar
 # TCP port for incoming HTTP connections. Default value is 9000.
-#sonar.web.port=9000
+sonar.web.port=9000
 
 
 # The maximum number of connections that the server will accept and process at any given time.
@@ -130,15 +135,16 @@ sonar.jdbc.url=jdbc:postgresql://{{sonar_jdbc_host}}:{{sonar_jdbc_port}}/{{sonar
 
 # The inactivity timeout duration of user sessions, in minutes. After the configured
 # period of time, the user is logged out.
-# The default value is set to 3 days (4320 minutes).
-# It must be set between 5 minutes and 3 months.
-# Value must be strictly positive.
+# The default value is set to 3 days (4320 minutes)
+# and cannot be greater than 3 months. Value must be strictly positive.
 #sonar.web.sessionTimeoutInMinutes=4320
 
 # A passcode can be defined to access some web services from monitoring
 # tools without having to use the credentials of a system administrator.
 # Check the Web API documentation to know which web services are supporting this authentication mode.
 # The passcode should be provided in HTTP requests with the header "X-Sonar-Passcode".
+
+
 # By default feature is disabled.
 #sonar.web.systemPasscode=
 
@@ -174,7 +180,6 @@ sonar.jdbc.url=jdbc:postgresql://{{sonar_jdbc_host}}:{{sonar_jdbc_port}}/{{sonar
 
 # Enable the LDAP feature
 # sonar.security.realm=LDAP
-
 # Set to true when connecting to a LDAP server using a case-insensitive setup.
 # sonar.authenticator.downcase=true
 
@@ -233,14 +238,14 @@ sonar.jdbc.url=jdbc:postgresql://{{sonar_jdbc_host}}:{{sonar_jdbc_port}}/{{sonar
 #--------------------------------------------------------------------------------------------------
 # COMPUTE ENGINE
 # The Compute Engine is responsible for processing background tasks.
-# Compute Engine is executed in a dedicated Java process. Default heap size is 512MB.
+# Compute Engine is executed in a dedicated Java process. Default heap size is 512Mb.
 # Use the following property to customize JVM options.
 #    Recommendations:
 #
 #    The HotSpot Server VM is recommended. The property -server should be added if server mode
 #    is not enabled by default on your environment:
 #    http://docs.oracle.com/javase/8/docs/technotes/guides/vm/server-class.html
-#
+##
 #sonar.ce.javaOpts=-Xmx512m -Xms128m -XX:+HeapDumpOnOutOfMemoryError
 
 # Same as previous property, but allows to not repeat all other settings like -Xmx
@@ -250,8 +255,7 @@ sonar.jdbc.url=jdbc:postgresql://{{sonar_jdbc_host}}:{{sonar_jdbc_port}}/{{sonar
 #--------------------------------------------------------------------------------------------------
 # ELASTICSEARCH
 # Elasticsearch is used to facilitate fast and accurate information retrieval.
-# It is executed in a dedicated Java process. Default maximum heap size is 512MB.
-# It is recommended to also set MaxDirectMemorySize (-XX:MaxDirectMemorySize) and set it to half the maximum heap size.
+# It is executed in a dedicated Java process. Default heap size is 512Mb.
 #
 # --------------------------------------------------
 # Word of caution for Linux users on 64bits systems
@@ -265,23 +269,20 @@ sonar.jdbc.url=jdbc:postgresql://{{sonar_jdbc_host}}:{{sonar_jdbc_port}}/{{sonar
 #
 
 # JVM options of Elasticsearch process
-sonar.search.javaOpts=-Xmx512m -Xms512m -XX:MaxDirectMemorySize=256m -XX:+HeapDumpOnOutOfMemoryError
+#sonar.search.javaOpts=-Xms512m -Xmx512m -XX:+HeapDumpOnOutOfMemoryError
 
 # Same as previous property, but allows to not repeat all other settings like -Xmx
 #sonar.search.javaAdditionalOpts=
 
-# Elasticsearch port for incoming HTTP connections. Default is 9001. Use 0 to get a free port.
+# Elasticsearch port. Default is 9001. Use 0 to get a free port.
 # As a security precaution, should be blocked by a firewall and not exposed to the Internet.
 #sonar.search.port=9001
-
-# Elasticsearch TCP transport port that is bound to loopback address. When nothing is set, a random port will be chosen.
-# As a security precaution, your OS configuration should not expose this port for external access.
-#sonar.es.port=
 
 # Elasticsearch host. The search server will bind this address and the search client will connect to it.
 # Default is loopback address.
 # As a security precaution, should NOT be set to a publicly available address.
 #sonar.search.host=
+
 
 
 #--------------------------------------------------------------------------------------------------
@@ -309,14 +310,9 @@ sonar.search.javaOpts=-Xmx512m -Xms512m -XX:MaxDirectMemorySize=256m -XX:+HeapDu
 #http.proxyUser=
 #http.proxyPassword=
 
-# Proxy exceptions: list of hosts that can be accessed without going through the proxy
-#                   separated by the '|' character, wildcard character '*' can be used for pattern matching
-#                   used for HTTP and HTTPS (default none)
-#                   (note: localhost and its literal notations (127.0.0.1, ...) are always excluded)
-#http.nonProxyHosts=
-
 
 #--------------------------------------------------------------------------------------------------
+
 # LOGGING
 
 # SonarQube produces logs in 4 logs files located in the same directory (see property sonar.path.logs below),
@@ -326,9 +322,8 @@ sonar.search.javaOpts=-Xmx512m -Xms512m -XX:MaxDirectMemorySize=256m -XX:+HeapDu
 #   Compute Engine (aka. CE) logs in ce.log
 #   Elasticsearch (aka. ES) logs in es.log
 #
-# Depending on the startup, all 4 files follow the same rolling policy (see sonar.log.rollingPolicy and sonar.log.maxFiles) but it applies
+# All 4 files follow the same rolling policy (see sonar.log.rollingPolicy and sonar.log.maxFiles) but it applies
 # individually (eg. if sonar.log.maxFiles=4, there can be at most 4 of each files, ie. 16 files in total).
-# If the SonarQube wrapper is used (for example, with the provided start.sh script), the sonar.log rotation policy needs to be set in the wrapper.conf
 #
 # All 4 files have logs in the same format:
 #           1           2    3           4                       5                                                   6
@@ -352,6 +347,9 @@ sonar.search.javaOpts=-Xmx512m -Xms512m -XX:MaxDirectMemorySize=256m -XX:+HeapDu
 #    Package names are truncated to keep the whole field to 20 characters max
 # 6: log payload. Content of this field does not follow any specific format, can vary in length and include line returns.
 #    Some logs, however, will follow the convention to provide data in payload in the format " | key=value"
+
+
+
 #    Especially, log of profiled pieces of code will end with " | time=XXXXms".
 
 # Global level of logs (applies to all 4 processes).
@@ -402,7 +400,6 @@ sonar.search.javaOpts=-Xmx512m -Xms512m -XX:MaxDirectMemorySize=256m -XX:+HeapDu
 
 #--------------------------------------------------------------------------------------------------
 # OTHERS
-
 # Delay in seconds between processing of notification queue. Default is 60 seconds.
 #sonar.notifications.delay=60
 
@@ -417,3 +414,12 @@ sonar.search.javaOpts=-Xmx512m -Xms512m -XX:MaxDirectMemorySize=256m -XX:+HeapDu
 # We don't collect source code or IP addresses. And we don't share the data with anyone else.
 # To see an example of the data shared: login as a global administrator, call the WS api/system/info and check the Statistics field.
 #sonar.telemetry.enable=true
+
+
+#--------------------------------------------------------------------------------------------------
+# DEVELOPMENT - only for developers
+# The following properties MUST NOT be used in production environments.
+
+# Elasticsearch HTTP connector
+#sonar.search.httpPort=-1
+
