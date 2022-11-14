@@ -33,6 +33,17 @@
   ansible.builtin.file:
     path: /opt/sonarqube-7.9.3.zip
     state: absent
+    
+    ##### #- name: add user to run sonar
+             ansible.builtin.shell: useradd -c "user to run SonarQube" -d /opt/sonarqube -g sonar sonar 
+  
+  ##### #- name: Update user in sonar.sh filee
+           ansible.builtin.lineinfile:
+           path: /opt/sonarqube/bin/linux-x86-64/sonar.sh
+           regexp: '^#RUN_AS_USER='
+           state: present
+           line: RUN_AS_USER=sonar
+
  
 
 - name: change ownership
